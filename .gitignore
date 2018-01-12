@@ -1,0 +1,5 @@
+REST-api/AppReact/node_modules/
+REST-api/express-app/api/node_modules
+REST-api/express-app/api/*.log
+REST-api/express-app/api/*.njsproj
+REST-api/express-app/*.sln
