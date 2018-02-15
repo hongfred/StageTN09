@@ -1,0 +1,1 @@
+Pour commencer l'application, se rendre avec node dans le dossier AppReact et utiliser la commande "npm run start"

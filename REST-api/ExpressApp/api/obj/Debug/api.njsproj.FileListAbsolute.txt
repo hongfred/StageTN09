@@ -1,0 +1,3 @@
+D:\frederic\Documents\cours\REST-api\express-app\api\obj\Debug\api.njsprojResolveAssemblyReference.cache
+D:\frederic\Documents\cours\REST-api\express-app\api\obj\Debug\api.njsproj.CoreCompileInputs.cache
+D:\frederic\Documents\cours\REST-api\express-app\api\bin\Microsoft.NodejsTools.WebRole.dll
