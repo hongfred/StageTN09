@@ -2,21 +2,19 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql');
-var DB = require('../function/DbConnect.js');
+
 var Promise = require('bluebird');
-var stringJ = "lol";
-//stringJ = JSON.stringify(stringJ);
+var myDB = require('../database')
 
-router.get('/', function (req, res) {
-    var pUID = 'root';
-    var pPASS = '020295';
-    var myDB = new DB.DBConnect(pUID, pPASS);
-    var sql = "INSERT INTO datafred (data) VALUES (" + stringJ + ")";
-    console.log(stringJ);
-    //myDB.InsertInto(sql)
 
-    res.send(
-        'insert into database done'
+router.post('/', function (req, res) {
+    console.log(req.body[0].cas)
+    var cas = JSON.stringify(req.body[0].cas)
+    var sql = "INSERT INTO datafred (data) VALUES (" + cas + ")";
+    myDB.InsertInto(sql)
+
+    res.json(
+        'Insert done'
     );
 });
 module.exports = router;

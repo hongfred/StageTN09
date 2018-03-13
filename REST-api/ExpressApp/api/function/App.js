@@ -17,6 +17,8 @@ var res = require('./Reseau.js');
 var iniF = require('./InitFunct.js');
 var rech = require('./Recherche.js');
 
+//certaines choses à supprimer ici et à déplacer dans varIni.
+
 //bool sansScenario = false;//permet d'executer la partie scénarion ou pas
 
 var SORTIE = false;//permet de ne pas executer le modèle si on a pas chargé le fichier XML
@@ -70,7 +72,7 @@ var myListPCC = []; //float
 var initialisation = function (Vini, reseau,myDB) {
     return new Promise(
         function (resolve, reject) {
-            //initialisation des var ini
+            //initialisation des variables contenues dans VarIni
             var pUID = Vini.pUID;
             var pPASS = Vini.pPASS;
             var heureDebut = Vini.heureDebut;
@@ -83,7 +85,9 @@ var initialisation = function (Vini, reseau,myDB) {
             var resultats = [];
             var rd = Math.random();
 
-           
+            //Compte le nombre de gares dans le réseau pour initialiser chaque gare une par une.
+            //Il est important de noter que j'ai beaucoup utilisé la récursion pour rendre mon code synchrone car je débutais en js. Il est donc possible
+            // de simplifier et optimiser le code en utilisant à la place des promise.all
             myDB.Count(sql)
                 .then(function (compteurGares) {
                     //console.log('mon compteur: ' + compteurGares);
@@ -96,7 +100,7 @@ var initialisation = function (Vini, reseau,myDB) {
                     //Première grande LOOP avec le nombre de gare, on initialise toutes les gares
                     var i = 0;
                     var initia = function (i) {
-                        if (i < /*nbGares*/357) {
+                        if (i < nbGares) {
                             console.log('iniGares: ' + i);
                             execution(i).then(function () {
                                 i = i + 1;
@@ -104,10 +108,10 @@ var initialisation = function (Vini, reseau,myDB) {
                             })
 
                         }
-                        else { //c'est iCi que  l'ini se finit, c'est pour ça qu'on appelle le tout ici
-                            //appel des grosses fonctions
+                        else { //Une fois que toutes les opérations sur toutes les gares, on finit l'initialisation ici, c'est pour ça qu'on appelle la suite de la simulation ici
+                            //appel des fonctions importantes de la simulation qui utilisent ce qui a été initialisé.
 
-                            //direction.MajDirections(Vini, reseau); A REMETTREEEEE
+                            direction.MajDirections(Vini, reseau);
                             console.log("INITIALISATION DONE");
                             console.log("");
                             console.log("");
@@ -129,6 +133,8 @@ var initialisation = function (Vini, reseau,myDB) {
                         }
                     }
                     initia(i);
+
+                    //grande boucle qui s'exécute autant de fois qu'il y a de gares.
                     function execution(i) {
                         return new Promise(
                             function (resolve2, reject2) {
@@ -146,7 +152,7 @@ var initialisation = function (Vini, reseau,myDB) {
                                         //maj des informations sur le noeud i
                                         var heure = 0;
                                         var entreEnv = function (i, heure, capaciteAccueil, Vini, _noeud, myDB) {//permet dans plan de gestion de créer la liste des passagers
-                                            if (heure <= /*23*/0) { //j'utilise cette méthode avec le if à la place du for pour rendre le tout synchrone
+                                            if (heure <= 23) { //j'utilise cette méthode avec le if à la place du for pour rendre le tout synchrone
                                                 //simule la capacité des trains, le nombre de passager venant et leur temps de correspondance
                                                 //ligne 140
                                                 iniF.loop1(i, heure, capaciteAccueil, Vini, _noeud, myDB)
@@ -155,7 +161,7 @@ var initialisation = function (Vini, reseau,myDB) {
                                                         entreEnv(i, heure, capaciteAccueil, Vini, _noeud, myDB);
                                                     })
                                             }
-                                            else { //permet d'attendre que le tout soit fini avant de changer de i donc de garder l'order
+                                            else { //permet d'attendre que l'opération soit finie avant de changer de i et donc de conserver l'ordre des opérations
                                                 return 0;
                                             }
                                         }
@@ -165,7 +171,7 @@ var initialisation = function (Vini, reseau,myDB) {
                                     //permet de trouver les voisins de chaque gares
                                     .then(function () {
                                         //2 ème petite LOOP avec j
-                                        for (var j = 0; j < /*nbGares*/357; j++) { //permet à maj direction de se faire
+                                        for (var j = 0; j < nbGares; j++) { //permet à maj direction de se faire
                                             //ligne 205
                                             //pareil que pour loop1
                                             iniF.loop2(i, j, Vini, capacite1, _noeud, myDB);
@@ -181,7 +187,7 @@ var initialisation = function (Vini, reseau,myDB) {
                                         //solution pour que tout soit dans l'ordre et pas random, rendre synchrone le non synchrone!
                                         var iter = 0;
                                         var distance = function (i, iter, Vini, _noeud, myDB) {//calcul tous les temps de parcours des différents trajets
-                                            if (iter < /*nbGares*/5) {
+                                            if (iter < nbGares) {
                                                 //console.log(it2);
                                                 iniF.loop3(i, iter, Vini, _noeud, myDB)
                                                     .then(function () {
@@ -226,7 +232,6 @@ var initialisation = function (Vini, reseau,myDB) {
                          }
                          else SORTIE = true;
                       }*/
-                    //ICI se finit le graaand then
                 })
                 .catch(function (error) {
                     console.log(error.message);
@@ -236,7 +241,7 @@ var initialisation = function (Vini, reseau,myDB) {
 
 //ligne 542
 //FONCTION 
-function heureDePointe(temps, pasDeTemps) { //ça marche
+function heureDePointe(temps, pasDeTemps) { //plutôt explicite comme nom
     return ((temps >= pasDeTemps * 7.5 && temps <= pasDeTemps * 9.5) || (temps >= pasDeTemps * 16.5 && temps <= pasDeTemps * 19.5));
 }
 
@@ -453,14 +458,17 @@ function scenarioNoeudTemps(elmScenarios) { //return void
     }
 }
 
+
+//méthode qui permet de faire tourner les scénarios dans la simulation. Appelée au début du plan de gestion.
+//Change certaines varibables de l'initialisation selon le scénario appelé
 //ligne 1237 scénario
-function scenario(Vini, reseau) { //void
+function scenario(Vini, reseau) { 
 
     //ligne 1654
     //initialisation var ini
     var debutScenario = Vini.debutScenario;
     //initialisation reseau
-    //var scenarios = reseau.scenarios;
+    var scenarios = reseau.scenarios;
 
     var sql = "";
     var resultats = []; //liste de string
@@ -520,6 +528,8 @@ function scenario(Vini, reseau) { //void
     //console.log(incidents.length);
 
     while (incidents.length > 0 && stop) {
+
+        //ce n'est pas fait correctement. à revoir
         var soh = new sortod.sortOnHeureDebut();
         //console.log(soh);
         //incidents.sort(soh);
@@ -530,6 +540,7 @@ function scenario(Vini, reseau) { //void
         //puis on la supprime après avoir ajouté les proc.
         supprimerDernierElt = true;
 
+        //scénario de base sur les composants principaux du réseau
         if (incidents[incidents.length - 1].type == "Scenario") {
             //int positionScenarion;
             var elmScenarios = new inc.Incident();
@@ -547,10 +558,9 @@ function scenario(Vini, reseau) { //void
             /*incidents.splice(positionScenario, 1);
             supprimerDernierElt = false;*/
         }
-        else {
+        else { //scénarios supplémentaires en plus de ceux de base
             var procedure = new inc.Incident();
             procedure.Procedure();
-            console.log(procedure);
             switch (procedure.typeComposanteDefaillante) {
                 case "PCC":
                     //#region partie PCC
@@ -620,12 +630,19 @@ function scenario(Vini, reseau) { //void
     }
 }
 
+//Fait tourner la simulation après l'initialisation et calcule la résilience
+//Pas mal de console.log qui me permettaient de savoir où j'en étais dans la simulation, à enlever
+//Pas mal de tests laissés en commentaire, à supprimer
+//J'ai décidé de les laisser au cas où le suivant en a besoin
 
+//J'ai limité certains paramètres car une simulation entière était trop longue pour être testée, ne pas oublier de les retirer
+//webworkers pour améliorer la fluidité du planDeGestion????
 //ligne 2842
-function planDeGestion(Vini, reseau) { //void
+function planDeGestion(Vini, reseau) {
     return new Promise(
         function (resolve, reject) {
-            //ini variable
+
+            //initialisation variables
             var pUID = Vini.pUID;
             var pPASS = Vini.pPASS;
             var pasDeTemps = Vini.pasDeTemps;
@@ -637,6 +654,7 @@ function planDeGestion(Vini, reseau) { //void
             var tempsCorrespondanceMetro = Vini.tempsCorrespondanceMetro;
             var tempsDeParcoursLienRER = Vini.tempsDeParcoursLienRER;
             var tempsDeParcoursLienMetro = Vini.tempsDeParcoursLienMetro;
+
             //intervalle de temps séparant chaque départ de train dans les terminus des lignes
             var intervalleDepartTrainsPointe = Vini.intervalleDepartTrainsPointe;
             var intervalleDepartTrainsCreuse = Vini.intervalleDepartTrainsCreuse;
@@ -645,7 +663,7 @@ function planDeGestion(Vini, reseau) { //void
 
             var compteurTrain = Vini.compteurTrain;
 
-            //ini reseau
+            //initialisation reseau
             var gares = reseau.gares;
             var directions = reseau.directions;
 
@@ -665,38 +683,32 @@ function planDeGestion(Vini, reseau) { //void
             //int capGare = 150000;
             //if (!sansScenario) scenario();//a supprimer
 
-            //scenario(); A REMETRE
+            //ATTENTION. Désactivé pour le moment mais c'est ce qui permet de lancer des scénarios dans la simulation
+            //scenario(); 
 
             sql = 'SELECT DISTINCT NomLigne FROM composantes';
             var myDB = new DB.DBConnect(pUID, pPASS);
             myDB.Select(sql)
                 .then(function (tabLignes) {
-
-                    //AFFICHAGE
-                    //console.log(tabLignes);
-                    //console.log(tabLignes.length);
-
                     for (var i = 0; i < tabLignes.length; i++) {
                         kmParcouruParLigne.push(0);
                         compteNbPassagersParLigne.push(0);
                     }
                     var affichage = [nbGares, heureDebut * pasDeTemps + dureeTotale * pasDeTemps];//pour enregistrer les données de charge des passagers
-                    //console.log('affichage: ' + affichage);
+                  
                     affichageParLigne = new Array(/*1440 / pasDeTemps*/18); //pourquoi 360 alors qu'il n'y a que 16 lignes?
-                    //console.log(affichageParLigne.length)
+
                     for (var crea = 0; crea < affichageParLigne.length; crea++) {
                         affichageParLigne[crea] = new Array(/*heureDebut * pasDeTemps + dureeTotale * pasDeTemps*/19);
                     }
-                    //console.log(affichageParLigne);
+
+                    //Variable non utilisée. 
                     var sb_dynamique = [];
                     //System.Text.StringBuilder sb_dynamique = new System.Text.StringBuilder();
-                    //console.log(heureDebut * pasDeTemps + dureeTotale * pasDeTemps)
 
-                    //console.log(heureDebut * pasDeTemps + dureeTotale * pasDeTemps)
-                    //POUR CHAQUE HORAIRE, ON FAIT TOUT TOURNER
-                    //chaque itération représente 15 min
-                    //16 à ... ;
-                    //ça marche quand on met le max
+
+                    //On fait tourner la simulation d'une heure de départ à une heure de fin.
+                    //chaque itération représente 15 min (pasDeTemps)
                     for (_temps = heureDebut * pasDeTemps; _temps < /*heureDebut * pasDeTemps + dureeTotale * pasDeTemps*/20; _temps++) {
                         console.log("");
                         console.log("       ITEMPS: " + _temps);
@@ -706,10 +718,6 @@ function planDeGestion(Vini, reseau) { //void
                         //console.log(sb_dynamique);
                         temps = _temps % (24 * pasDeTemps);
 
-                        //TEST FOR
-                        //var passager = new pass.Passager();
-                        //console.log(passager)
-
                         for (var k = 0; k < gares.length; k++) {
                             //gares[k].listeDesPassagers.push(passager);
                             for (var l = 0; l < gares[k].listeDesPassagers.length; l++) {
@@ -718,6 +726,7 @@ function planDeGestion(Vini, reseau) { //void
                             }
                         }
 
+                        //C'était en commentaire dans le code de base
                         //MAJ de la capacité des train relative aux passagers qui font une correspondance 
                         /*for (int k1 = 0; k1 < directions.Count; k1++)
                         {
@@ -735,9 +744,8 @@ function planDeGestion(Vini, reseau) { //void
                         //ligne2905
                         //POUR CHAQUE GARES, ON FAIT TOURNER LA SIMULATION
                         //ça marche
-                        for (var iterNoeud = 0; iterNoeud < /*nbGares*/357; iterNoeud++) {
-
-
+                        for (var iterNoeud = 0; iterNoeud < nbGares; iterNoeud++) {
+                            
                             console.log("");
                             console.log('ITERNOEUD: ' + iterNoeud);
                             console.log('listepass length: ' + gares[iterNoeud].listeDesPassagers.length);
@@ -746,9 +754,8 @@ function planDeGestion(Vini, reseau) { //void
                                 //console.log(directions[18].trains);
                             }
 
-                            //NE SE FAIT PAS A L ITE 1 PARCE QUIL FAUT INITIALISER DES TRAINS DANS DIRECTION VOIR LIGNE 3217
+                            //NE SE FAIT PAS A L ITERATION 1 PARCE QU'IL FAUT INITIALISER DES TRAINS DANS LES DIRECTIONS VOIR LIGNE 3217
                             //On supprime les trains arrivés au terminus
-                            //SUPPRESSION DES TRAINS
                             for (var iter = 0; iter < directions.length; iter++) {
                                 //console.log('nb trains: ' + directions[iter].trains.length + '  direction: ' + iter);
                                 //console.log(directions[iter].trains);
@@ -832,7 +839,7 @@ function planDeGestion(Vini, reseau) { //void
                                 }
                             }
 
-                            //RETIRE PASSAGER ARRIVES
+                            //RETIRE LES PASSAGERS ARRIVES
                             for (var iter = 0; iter < gares[iterNoeud].listeDesPassagers.length; iter++) {
                                 //console.log("");
                                 //console.log("je suis dans le retire passager")
@@ -941,11 +948,12 @@ function planDeGestion(Vini, reseau) { //void
                                         && (!gares[iterNoeud].listeDesPassagers[iter].passagerTraite))
                                         && (gares[iterNoeud].listeDesPassagers[iter].parcoursEffectif[gares[iterNoeud].listeDesPassagers[iter].nombreStationsVisitees] == gares[iterNoeud].voisins[iterVoisins].indiceVoisin)) {
                                         nbVersVoisin++;
+
                                         //AFFICHAGE
                                         if (iter == gares[iterNoeud].listeDesPassagers.length - 1) {
                                             console.log("       je suis dans le if qui met à jour nbversvoisin dans le deuxième for du géant");
                                             console.log('           nbversvoisin: ' + nbVersVoisin);
-                                        }//
+                                        }// jusqu'ici
                                     }
                                 }
 
@@ -955,10 +963,10 @@ function planDeGestion(Vini, reseau) { //void
                                 var indiceTrain = 0;
                                 //console.log(directions)
 
-                                //on trouve la direction qui correspond à la gare(dépend du grand du for qui englobe tout et qui le fait 357fois) où on est grâce à la ligne avec ce for puis le if.
+                                //on trouve la direction qui correspond à la gare où l'on se trouve grâce à la ligne
                                 for (var iterDirs = 0; iterDirs < directions.length; iterDirs++) {
                                     //console.log("iterdirs: " + iterDirs);
-                                    //on cherche la ligne de la direction qui correspond à la gare qu'on est entrain de mettre à jouer
+                                    //on cherche la ligne de la direction qui correspond à la gare qu'on est entrain de mettre à jour
                                     if (directions[iterDirs].ligne == gares[iterNoeud].voisins[iterVoisins].ligne) {
                                         //console.log("       ITERDIRS: " + iterDirs);
 
@@ -974,8 +982,9 @@ function planDeGestion(Vini, reseau) { //void
                                             console.log("           iter noeud où je suis: " + iterNoeud);
                                             console.log("           ind voisins où je veux aller: " + gares[iterNoeud].voisins[iterVoisins].indiceVoisin);
                                             console.log('')*/
-                                            //regarde (position du train) compare (la gare dans laquelle on se trouve et la gare voisine où on veut aller)
-                                            //si c'est la bonne position, on met entre dans le train trouve!!
+                                            //regarde position du train
+                                            //compare la gare dans laquelle on se trouve et la gare voisine où on veut aller
+                                            //si c'est la bonne position, traintrouve = true et on passe à la suite 
                                             //si timer est plus petit que 0 et que le parcours-1 de la direct correspond à l'iterN où on se trouve et que le parcours correspond à l'indiceVoisin de la gare
                                             if ((directions[iterDirs].trains[iterTrains]._timer <= 0) && (directions[iterDirs].trains[iterTrains].parcours[directions[iterDirs].trains[iterTrains].nombreStationsVisitees - 1] == iterNoeud)) {
                                                 if (directions[iterDirs].trains[iterTrains].parcours[directions[iterDirs].trains[iterTrains].nombreStationsVisitees] == gares[iterNoeud].voisins[iterVoisins].indiceVoisin) {
@@ -1074,7 +1083,7 @@ function planDeGestion(Vini, reseau) { //void
                                                         gares[iterNoeud].listeDesPassagers[iter].premierPasSurLien = true;
                                                         gares[gares[iterNoeud].voisins[iterVoisins].indiceVoisin]._listeDesPassagersEnAttente.push(gares[iterNoeud].listeDesPassagers[iter]);
 
-                                                        var index = rech.indexOf(tabLignes, gares[iterNoeud].listeDesPassagers[iter].ligne); //ne  pas mettre en commentaire
+                                                        var index = rech.indexOf(tabLignes, gares[iterNoeud].listeDesPassagers[iter].ligne); 
 
 
                                                         //Km parcouru sur une ligne
@@ -1103,7 +1112,7 @@ function planDeGestion(Vini, reseau) { //void
                                                         function loop5(fl) {
                                                             //console.log(fl)
                                                             var compteur = 0;
-                                                            while (keepGoing && compteur < 1) { // solution temporaire, pose problème si on entre jamais dans le else
+                                                            while (keepGoing && compteur < 1) { 
                                                                 if (fl.ligne != gares[iterNoeud].listeDesPassagers[iter].ligne) {
                                                                     myLine = fl.ligne;
                                                                     fl_bis = fl;
@@ -1243,7 +1252,7 @@ function planDeGestion(Vini, reseau) { //void
                                                         function loop6(fl) {
                                                             //console.log(fl)
                                                             var compteur = 0;
-                                                            while (keepGoing1 && compteur < 1) { // solution temporaire, pose problème si on entre jamais dans le else
+                                                            while (keepGoing1 && compteur < 1) {
                                                                 if (fl.ligne != gares[iterNoeud].listeDesPassagers[iter].ligne) {
                                                                     //gares[iterNoeud].listeDesPassagers[iter]._timer = tempsCorrespondanceMetro; 
                                                                     //directions[indiceDir].trains[indiceTrain].nbCorrespondance++; 
@@ -1305,7 +1314,7 @@ function planDeGestion(Vini, reseau) { //void
                                         }
                                     }//ligne 3263
                                     //2grand
-                                    if (directions[indiceDir].trains[indiceTrain].nombreStationsVisitees - 2 >= 0) { //ne pas oublier d'enlever comment
+                                    if (directions[indiceDir].trains[indiceTrain].nombreStationsVisitees - 2 >= 0) { 
                                         //console.log("je suis dans le 2grand if du géant");
 
                                         var ind3 = directions[indiceDir].trains[indiceTrain].parcours[directions[indiceDir].trains[indiceTrain].nombreStationsVisitees - 2];
@@ -1484,8 +1493,6 @@ function planDeGestion(Vini, reseau) { //void
                             }//ligne 3377
 
                             //on créer le nombre de passager qui a été estimé dans l'initialisation
-                            //ICI LES LISTES DE PASSAGERS SONT CREES
-                            //CA MARCHE
                             console.log("");
                             console.log("   JE CREE PASSAGER");
                             console.log('   look ' + gares[iterNoeud].nombreDePassagersVenantDeEnv[temps])
@@ -1508,7 +1515,7 @@ function planDeGestion(Vini, reseau) { //void
                                 passager.parcoursEffectif = passager.parcoursNormal;
 
 
-                                ///////////////AAAAAAAAAAAAA REGARDEEEEEEEEEEEEEEEEEEEEEEEEEERRRRRRRRRRRRRRRR
+                                ///////////////A REGARDER ET COMPRENDRE
                                 /*if ((temps > debutScenario + 5) && (temps < debutScenario + 5 + 120) && (chkGestion.Checked)) {///// le checked sert à vérifier si une case est cochée
                                     passager.parcoursEffectif = trouverChemin(gares, gares[iterNoeud], gares[passager.idStationSortie], "", 3);
                                     //console.log(passager)
@@ -1534,7 +1541,6 @@ function planDeGestion(Vini, reseau) { //void
 
                                             if (fl.ligne == stockVoisins10.ligne) {
                                                 monArc = fl;
-                                                //break; resolu normalement
                                                 keepGoing2 = false;
                                             }
                                             else {
@@ -1558,7 +1564,7 @@ function planDeGestion(Vini, reseau) { //void
 
                         //ligne 3414  
                         //on met les passagers en attente dans la liste de passager
-                        for (var iterNoeud = 0; iterNoeud < /*nbGares*/357; iterNoeud++) {
+                        for (var iterNoeud = 0; iterNoeud < nbGares; iterNoeud++) {
 
                             /*gares[iterNoeud]._listeDesPassagersEnAttente.forEach(function (passager) { j'ai remplacé le  foreach par un for, je ne pense pas qu'il y ait une diff
                                 gares[iterNoeud].listeDesPassagers.push(passager);
@@ -1574,9 +1580,9 @@ function planDeGestion(Vini, reseau) { //void
                             affichage[iterNoeud, _temps] = rech.passagersEnStation(gares[iterNoeud].listeDesPassagers).length;
                             //console.log(affichage)
                         }
+
                         //ligne3429
-                        //ça  marche
-                        //injection des trains dans le système
+                        //injection des trains dans la simulation
                         for (var iter = 0; iter < directions.length; iter++) {
                             //console.log("iterInjT: " + iter)
                             //on y entre si il n'y a pas encore de train dans le système sinon c'est dans le if plus bas
@@ -2020,7 +2026,7 @@ function conversionHeure(heure) {  //return int, heure est un string
 }
 
 
-//fonction qui lance l'initialisation et qui envoie au serveur le résultat.
+//fonction qui lance l'initialisation et qui est appelé dans testSimu.js
 module.exports.test = function (myDB) {
     return new Promise(
         function (resolve, reject) {
@@ -2047,6 +2053,6 @@ module.exports.test = function (myDB) {
 
 
 //FAIRE AFFICHAGE
-//regarde 6138 pour voir où est le graphe
-//var importante: resultatsref, affichageparligne, tout ce qui ca avec reference
+//regarde ligne 6138 pour voir où est le graphe
+//var importante: resultatsref, affichageparligne, tout ce qui va avec reference
 //classe graph à regarder

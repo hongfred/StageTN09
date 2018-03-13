@@ -1,0 +1,41 @@
+Je n'ai pas mentionné certains des fichiers car ils ne sont pas encore utilisés dans le code ou servaient juste à des tests.
+
+App.js: Contient les fonctions principales de l'application à savoir, l'initialisation, les scénarios et le plan de gestion. A noter que 
+beaucoup de fonctions utilisées dans ces méthodes sont contenues dans d'autres classes.
+
+DbConnect.js: Contient toutes les méthodes qui permettent d'effectuer des actions sur la base de données.
+
+Direction.js: Permet de modéliser les itinéraires des métros. (lignes de métro, parcours ...). Contient la méthodes MajDirections qui
+permet justement d'initialiser les itinéraires.
+
+Incident.js: Représente un scénario dans notre simulation.
+
+IniFunct.js: Comme son nom l'indique, elle contient les fonctions permettant de faire fonctionner l'initialisation de l'App.
+
+Passager.js: Classe représentant un passager.
+
+Rail.js: Classe représentant les voisins d'une gare.
+
+Recherche.js: Contient toutes les fonctions de recherche utilisées dans le plan de gestion.
+
+Reseau.js: C'est ce qui est passé dans toute l'application et qui contient toutes les données de l'initialisation.
+
+Structure.js: Classe permettant d'initialiser les gares du réseau. Contient aussi les fonctions permettant de calculer le plus court
+chemin entre deux gares (elles sont utilisées dans Direction.js).
+
+Train.js: Classe représentant les caractéristiques des trains.
+
+VarIni.js: Contient toutes les variables pré-initialisées.
+
+fetch.js: Comme son nom l'indique, permet au front-end de fetch les données à afficher.
+
+insertScenarios.js: Permet d'insérer les scénarios créés dans le front-end dans la base de donnée. (Ce n'est pas encore prêt,
+il faut encore y ajouter quelques modifications).
+
+testSimu.js: Permet de lancer la simulation.
+
+app.js: fait tourner l'API.
+
+database.js: Permet d'éviter d'avoir trop de connections sur la base de données.
+
+

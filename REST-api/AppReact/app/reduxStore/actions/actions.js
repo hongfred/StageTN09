@@ -13,7 +13,7 @@ import {
   ITEMS_FETCH_VOISINS_R_SUCCESS,
   ITEMS_FETCH_COMPOSANTS_A_SUCCESS,
   ITEMS_FETCH_VOISINS_A_SUCCESS,
-  SCENARIO_POST_DATA_SUCCESS,
+  DATA_POST_SCENARIO_SUCCESS,
   ADD_SCENARIO_AUGMENTATION_LIEN,
   ADD_SCENARIO_AUGMENTATION_LIGNE,
   ADD_SCENARIO_AUGMENTATION_NOEUD,
@@ -114,7 +114,7 @@ export function addScenarioALien(debut,fin,nD,nA,ligne,taux) {
 		nA,
 		ligne,
 		taux	
-	}
+	};
 }
 
 export function addScenarioALigne(debut,fin,ligne,taux) {
@@ -136,7 +136,7 @@ export function addScenarioANoeud(debut,fin,noeud,temps) {
 		fin,
 		noeud,
 		temps	
-	}
+	};
 }
 
 export function addScenarioRLien(debut,fin,nD,nA,ligne,taux) {
@@ -149,7 +149,7 @@ export function addScenarioRLien(debut,fin,nD,nA,ligne,taux) {
 		nA,
 		ligne,
 		taux
-	}
+	};
 }
 
 export function addScenarioRLigne(debut,fin,ligne) {
@@ -159,7 +159,7 @@ export function addScenarioRLigne(debut,fin,ligne) {
 		debut,
 		fin,
 		ligne
-	}
+	};
 }
 export function addScenarioRTrain(debut,fin,noeud,taux) {
 	return { 
@@ -169,37 +169,37 @@ export function addScenarioRTrain(debut,fin,noeud,taux) {
 		fin,
 		noeud,
 		taux
-	}
+	};
 }
 
 export function addScenarioP(text) {
 	return { 
 		type: ADD_SCENARIO_PERTURBATION, 
 		text
-	}
+	};
 }
 
 export function deleteScenario() {
 	return { 
 		type: DELETE_SCENARIO
-	}
+	};
 }
 
 export function deleteComposant() {
 	return { 
 		type: DELETE_COMPOSANT
-	}
+	};
 }
 
 export function deleteVoisin() {
 	return { 
 		type: DELETE_VOISIN
-	}
+	};
 }
 
 export function scenarioPostScenarioSuccess(scenario) {
-    return {
-        type: SCENARIO_POST_SCENARIO_SUCCESS,
+	return {
+        type: DATA_POST_SCENARIO_SUCCESS,
         scenario
     };
 }
@@ -247,10 +247,16 @@ export function itemsFetchData(url, option) {
     });
 }
 
-export function scenarioPostData(url) {
+export function scenarioPostData(url, data) {
     return((dispatch) => {
         dispatch(itemsIsLoading(true));
-        fetch(url)
+        fetch(url, {
+			headers: {
+				'content-type': 'application/json'
+			},
+			method: 'POST',
+			body: 	JSON.stringify(data)
+		})
             .then((response) => {
                 if (!response.ok) {
                     throw Error(response.statusText);

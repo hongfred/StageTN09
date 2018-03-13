@@ -36,8 +36,8 @@ class ReductionLigne extends React.Component{
 	}
 	
 	addS(){
-		const reg1=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])h[0-5][0-9]$/.test(this.props.debutR2);
-		const reg2=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])h[0-5][0-9]$/.test(this.props.finR2);
+		const reg1=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])(h|H|:)[0-5][0-9]$/.test(this.props.debutR2);
+		const reg2=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])(h|H|:)[0-5][0-9]$/.test(this.props.finR2);
 		if(reg1){
 			 document.getElementById('errorR2D_info').innerHTML="Format de l'heure de début non conforme!!";
 			 document.getElementById('errorR2D').removeAttribute('hidden');
@@ -70,8 +70,12 @@ class ReductionLigne extends React.Component{
 				<form>
 					<Row className="show-grid" style = {row}>
 						<Row className="show-grid" >
-							<div style = {affichage}>	
-								Réduction de {this.props.tauxR2}%  de {this.props.debutR2} à {this.props.finR2} sur la {this.props.ligneR2}
+							<div style = {affichage}>
+								<ul>
+									<li>Début: {this.props.debutR2}</li>
+									<li>Fin: {this.props.finR2}</li>
+									<li>Ligne: {this.props.ligneR2}</li>
+								</ul>
 							</div>	
 							<Col sm={6}>
 								<Field name="debutR2" component={renderField} type="text" placeholder="ex: 09h00" label="Heure de début" onChange={this.erreurD}/>
@@ -91,7 +95,8 @@ class ReductionLigne extends React.Component{
 								<div style={{paddingLeft:'25%'}}>
 									<label>Sélectionnez la ligne</label>
 									<div>
-										<Field name="ligneR2" component="select" multiple value={[]} type="select-multiple" style={{width:150}} onChange={this.erreurL}>
+										<Field name="ligneR2" component="select" style={{width:140}} onChange={this.erreurL}>
+											<option></option>
 											{this.props.MesLignes.map(items =>
 											<option key={items.idatelier}>{items.ligne}</option>)
 											}

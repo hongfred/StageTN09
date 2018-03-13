@@ -40,8 +40,8 @@ class ReductionTrain extends React.Component{
 	}
 	
 	addS(){
-		const reg1=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])h[0-5][0-9]$/.test(this.props.debutR3);
-		const reg2=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])h[0-5][0-9]$/.test(this.props.finR3);
+		const reg1=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])(h|H|:)[0-5][0-9]$/.test(this.props.debutR3);
+		const reg2=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])(h|H|:)[0-5][0-9]$/.test(this.props.finR3);
 		const reg3=!/^[0-9]*$/.test(this.props.tauxR3);
 		if(reg1){
 			 document.getElementById('errorR3D_info').innerHTML="Format de l'heure de début non conforme!!";
@@ -79,7 +79,12 @@ class ReductionTrain extends React.Component{
 					<Row className="show-grid" style = {row}>
 						<Row className="show-grid" >
 							<div style = {affichage}>
-								Réduction de {this.props.tauxR3}%  de {this.props.debutR3} à {this.props.finR3} sur le {this.props.noeudR3}
+								<ul>
+									<li>Début: {this.props.debutR3}</li>
+									<li>Fin: {this.props.finR3}</li>
+									<li>Ligne: {this.props.noeudR3}</li>
+									<li>Taux: {this.props.tauxR3}</li>
+								</ul>
 							</div>	
 							<Col sm={6}>
 								<Field name="debutR3" component={renderField} type="text" placeholder="ex: 09h00" label="Heure de début" onChange={this.erreurD}/>

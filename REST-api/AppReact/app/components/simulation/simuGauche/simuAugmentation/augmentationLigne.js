@@ -44,8 +44,8 @@ class AugmentationLigne extends React.Component{
 	}
 	
 	addS(){
-		const reg1=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])h[0-5][0-9]$/.test(this.props.debut);
-		const reg2=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])h[0-5][0-9]$/.test(this.props.fin);
+		const reg1=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])(h|H|:)[0-5][0-9]$/.test(this.props.debut);
+		const reg2=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])(h|H|:)[0-5][0-9]$/.test(this.props.fin);
 		const reg3=!/^[0-9]*$/.test(this.props.taux);
 		if(reg1){
 			 document.getElementById('errorD_info').innerHTML="Format de l'heure de début non conforme!!";
@@ -82,8 +82,13 @@ class AugmentationLigne extends React.Component{
 				<form>
 					<Row className="show-grid" style = {row}>
 						<Row className="show-grid" >
-							<div style = {affichage}>	
-								Augmentation de {this.props.taux}%  de {this.props.debut} à {this.props.fin} sur la {this.props.ligne}
+							<div style = {affichage}>
+								<ul>
+									<li>Debut: {JSON.stringify(this.props.debut)}</li>
+									<li>Fin: {JSON.stringify(this.props.fin)}</li>
+									<li>Ligne: {JSON.stringify(this.props.ligne)}</li>
+									<li>Taux: {JSON.stringify(this.props.taux)}</li>
+								</ul>
 							</div>	
 							<Col sm={6}>
 								<Field name="debut" component={renderField} type="text" placeholder="ex: 09h00" label="Début" onChange={this.erreurD}/>

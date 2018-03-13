@@ -31,21 +31,19 @@ app.use(function (req, res, next) {
     var log_string = time + "  IP:  " + req.ip + " Method: " + req.method + "  Url: " + req.originalUrl + "  Body: " + JSON.stringify(req.body);
     console.log(log_string);
     fs.appendFile("Api_log.log", log_string + '\r\n', 'utf-8', function (err) { if (err) { throw Error(err); } });
-    res.set({ 'Access-Control-Allow-Origin': '*' });
+    res.set({ 'Access-Control-Allow-Origin': 'http://localhost:8080' });
     res.set({ 'Access-Control-Allow-Credentials': true });
-    res.set({ 'Access-Control-Allow-Headers': 'content-type' });
-    res.set({ 'Access-Control-Allow-Methods': 'POST,GET,PUT,OPTIONS' });
     next();
 });
-/*
+
 app.use(function (req, res, next) {
     if (req.method == 'OPTIONS') {
         res.set({ 'Access-Control-Allow-Methods': 'POST,GET,PUT,OPTIONS' });
         res.set({ 'Access-Control-Allow-Headers': 'content-type' });
         res.status(204);
-        next();
     }
-});*/
+    next();
+});
 
 app.use('/', routes);
 app.use('/users', users);

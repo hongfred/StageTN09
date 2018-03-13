@@ -1,5 +1,5 @@
 import React from 'react';
-import {button, cadre, row, ul, selectMult, separation, label, buttonNav, affichage, span, field} from '../../../../css/style';
+import {button, cadre, row, ul, selectMult, separation, separationFirst, label, buttonNav, affichage, span, field} from '../../../../css/style';
 import {Button, Tab, Row, Col, Grid} from 'react-bootstrap';
 import { connect } from 'react-redux';
 import {
@@ -8,7 +8,7 @@ import {
 	deleteComposant,
 	deleteVoisin
 } from '../../../../reduxStore/actions/actions';
-import { Field, reduxForm, formValueSelector, reset} from 'redux-form';
+import { Field, reduxForm, formValueSelector, reset, change} from 'redux-form';
 
 const renderField = ({
   input,
@@ -28,9 +28,11 @@ const renderField = ({
 class AugmentationLien extends React.Component{
 	constructor(props) {
         super(props);
-		this.addS = this.addS.bind(this)
-		this.fetchVoisins = this.fetchVoisins.bind(this)
-		this.fetchComposants = this.fetchComposants.bind(this)
+		this.addS = this.addS.bind(this);
+		this.fetchVoisins = this.fetchVoisins.bind(this);
+		this.fetchComposants = this.fetchComposants.bind(this);
+		this.resetCV = this.resetCV.bind(this);
+		this.resetV = this.resetV.bind(this);
     }
 	
 	erreurD(){
@@ -54,14 +56,14 @@ class AugmentationLien extends React.Component{
 
 	
 	addS(){
-		const reg1=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])h[0-5][0-9]$/.test(this.props.debutA1);
-		const reg2=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])h[0-5][0-9]$/.test(this.props.finA1);
+		const reg1=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])(h|H|:)[0-5][0-9]$/.test(this.props.debutA1);
+		const reg2=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])(h|H|:)[0-5][0-9]$/.test(this.props.finA1);
 		const reg3=!/^[0-9]*$/.test(this.props.tauxA1);
 		if(reg1){
 			 document.getElementById('errorA1D_info').innerHTML="Format de l'heure de début non conforme!!";
 			 document.getElementById('errorA1D').removeAttribute('hidden');
 		}
-
+	
 		if(reg2){
 			document.getElementById('errorA1F_info').innerHTML="Format de l'heure de fin non conforme!!";
 			document.getElementById('errorA1F').removeAttribute('hidden');
@@ -94,22 +96,43 @@ class AugmentationLien extends React.Component{
 			this.props.deleteV();
 		}
 	}
+	
+	resetCV(){
+		this.props.deleteC();
+		this.props.deleteV();
+		if(this.props.nDA1!=undefined){
+			this.props.resetVar('nDA1');
+		}
+		if(this.props.nAA1!=undefined){
+			this.props.resetVar('nAA1');
+		}
+	}
+	resetV(){
+		this.props.deleteV();
+		if(this.props.nDA1!=undefined){
+			this.props.resetVar('nDA1');
+		}
+		if(this.props.nAA1!=undefined){
+			this.props.resetVar('nAA1');
+		}
+	}
+	
 	fetchComposants(ligne){
 		this.props.deleteV();
 		let url = "http://localhost:1337/fetch/composants/"+ligne;
 		this.props.fetchData(url, "5");	
 		if(this.props.nDA1!=undefined){
-			this.props.nDA1.pop();
+			this.props.resetVar('nDA1');
 		}
 		if(this.props.nAA1!=undefined){
-			this.props.nAA1.pop();
+			this.props.resetVar('nAA1');
 		}
 	}
 	fetchVoisins(ligne,id){
 		let url = "http://localhost:1337/fetch/voisins/"+ligne+"/"+id;
 		this.props.fetchData(url, "6");	
 		if(this.props.nAA1!=undefined){
-			this.props.nAA1.pop();
+			this.props.resetVar('nAA1');
 		}
 	}
 
@@ -125,12 +148,12 @@ class AugmentationLien extends React.Component{
 						<Row className="show-grid" >
 							<div style = {affichage}>
 								<ul>
-									debut: {JSON.stringify(this.props.debutA1)},
-									fin: {JSON.stringify(this.props.finA1)},
-									départ: {JSON.stringify(this.props.nDA1)},
-									arrivée: {JSON.stringify(this.props.nAA1)},
-									{JSON.stringify(this.props.ligneA1)},
-									taux: {JSON.stringify(this.props.tauxA1)}
+									<li>Debut: {JSON.stringify(this.props.debutA1)}</li>
+									<li>Fin: {JSON.stringify(this.props.finA1)}</li>
+									<li>Départ: {JSON.stringify(this.props.nDA1)}</li>
+									<li>Arrivée: {JSON.stringify(this.props.nAA1)}</li>
+									<li>Ligne: {JSON.stringify(this.props.ligneA1)}</li>
+									<li>Taux: {JSON.stringify(this.props.tauxA1)}</li>
 								</ul>
 							</div>	
 							<Col sm={6}>
@@ -152,6 +175,13 @@ class AugmentationLien extends React.Component{
 									<label>Ligne</label>
 									<div>
 										<Field name="ligneA1" size="4" component="select" onChange={this.erreurL}>
+											<option style={separationFirst} key="null" value=""
+												onClick={() => {
+													this.resetCV();
+												}}
+											>
+												select...
+											</option>
 											{this.props.MesLignes.map(items =>
 											<option key={items.idatelier}
 												onClick={() => {
@@ -159,6 +189,7 @@ class AugmentationLien extends React.Component{
 													  items.ligne
 													);
 												}}
+												style={separation}
 											>
 												{items.ligne}
 											</option>)
@@ -175,6 +206,13 @@ class AugmentationLien extends React.Component{
 									<label>Noeud de départ</label>
 									<div>
 										<Field name="nDA1" component="select" size="4" style={selectMult} onChange={this.erreurnD}>
+											<option style={separationFirst} key="null" value=""
+												onClick={() => {
+													this.resetV();
+												}}
+											>
+												select...
+											</option>
 											{this.props.MesComposantsA.map(composant =>
 												<option key={composant.idcomposante} 
 													onClick={() => {
@@ -201,6 +239,9 @@ class AugmentationLien extends React.Component{
 									<label>Noeud d'arrivée</label>
 									<div>
 										<Field name="nAA1" component="select" size="4" style={selectMult} onChange={this.erreurnA}>
+											<option style={separationFirst} key="null" value="">
+												select...
+											</option>
 											{this.props.MesVoisinsA.map(composant =>
 											<option key={composant.idcomposante} style={separation}>{composant.NomComposante}</option>)
 											}
@@ -266,7 +307,8 @@ const mapDispatchToProps = (dispatch) => {
         add: (debutA1,finA1,nDA1,nAA1, ligneA1,tauxA1) => dispatch(addScenarioALien(debutA1,finA1, nDA1, nAA1,ligneA1,tauxA1)),
 		fetchData: (url, option) => dispatch(itemsFetchData(url, option)),
 		deleteC: () => dispatch(deleteComposant()),
-		deleteV: () => dispatch(deleteVoisin())
+		deleteV: () => dispatch(deleteVoisin()),
+		resetVar: (variable) => dispatch(change('addScenarioALien', variable, ''))
     };
 };
 

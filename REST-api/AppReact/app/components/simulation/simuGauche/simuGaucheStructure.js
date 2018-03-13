@@ -29,7 +29,7 @@ export class SimuGaucheStructure extends React.Component{
 		return (
 			<Row className="show-grid">
 				<Panel header="Set the options" bsStyle="primary">
-					<Tabs defaultActiveKey={2} id='tabs' style = {tabSimu}>
+					<Tabs defaultActiveKey={3} id='tabs' style = {tabSimu}>
 						<Tab eventKey={1} title="Perturbations">	
 							<Tab.Container id="left-tabs" defaultActiveKey="first" style = {cadre}>
 								<Row className="clearfix">
@@ -82,7 +82,7 @@ export class SimuGaucheStructure extends React.Component{
 							</Tab.Container>
 						</Tab>
 						<Tab eventKey={3} title="Augmentation du temps de parcours et/ou de correspondance">
-							<Tab.Container id="middle-tabs" defaultActiveKey="first" style = {cadre}>
+							<Tab.Container id="middle-tabs" defaultActiveKey="third" style = {cadre}>
 									<Row className="clearfix">
 										<Col sm={4}>
 											<Nav bsStyle="pills" stacked style = {navSimu}>

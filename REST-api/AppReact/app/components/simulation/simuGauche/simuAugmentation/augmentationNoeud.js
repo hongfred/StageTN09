@@ -1,10 +1,10 @@
 import React from 'react';
-import {button, cadre, row, ul, selectMult, separation, label, buttonNav, affichage, field, span} from '../../../../css/style';
+import {button, cadre, row, ul, selectMult, separation, separationFirst, label, buttonNav, affichage, field, span} from '../../../../css/style';
 import {Button, Tab, Row, Col, Grid} from 'react-bootstrap';
 import { connect } from 'react-redux';
 import {
 	itemsFetchData,
-	addScenarioALien,
+	addScenarioANoeud,
 	deleteComposant,
 	deleteVoisin
 } from '../../../../reduxStore/actions/actions';
@@ -48,8 +48,8 @@ class AugmentationNoeud extends React.Component{
 	}
 	
 	addS(){
-		const reg1=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])h[0-5][0-9]$/.test(this.props.debutA2);
-		const reg2=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])h[0-5][0-9]$/.test(this.props.finA2);
+		const reg1=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])(h|H|:)[0-5][0-9]$/.test(this.props.debutA2);
+		const reg2=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])(h|H|:)[0-5][0-9]$/.test(this.props.finA2);
 		const reg3=!/^[0-9]*$/.test(this.props.tempsA2);
 		if(reg1){
 			 document.getElementById('errorA2D_info').innerHTML="Format de l'heure de début non conforme!!";
@@ -92,10 +92,10 @@ class AugmentationNoeud extends React.Component{
 						<Row className="show-grid" >
 							<div style = {affichage}>
 								<ul>
-									debut: {JSON.stringify(this.props.debutA2)},
-									fin: {JSON.stringify(this.props.finA2)},
-									départ: {JSON.stringify(this.props.noeudA2)},
-									Temps: {JSON.stringify(this.props.tempsA2)}
+									<li>Debut: {JSON.stringify(this.props.debutA2)}</li>
+									<li>Fin: {JSON.stringify(this.props.finA2)}</li>
+									<li>Départ: {JSON.stringify(this.props.noeudA2)}</li>
+									<li>Temps: {JSON.stringify(this.props.tempsA2)}</li>
 								</ul>
 							</div>	
 							<Col sm={6}>
@@ -114,9 +114,11 @@ class AugmentationNoeud extends React.Component{
 							<Col sm={12}>
 								<label>Noeud de départ</label>
 								<div>
-									<Field name="noeudA2" component="select" multiple value={[]} type="select-multiple" style={selectMult} onChange={this.erreurN}>
+									<Field name="noeudA2" component="select" size='4' style={selectMult} onChange={this.erreurN}>
+										<option style={separationFirst} id="null" value="">select...</option>
 										{this.props.MesComposants.map(composant =>
 											<option key={composant.idcomposante} 
+												style={separation}
 											>
 												{composant.NomComposante}
 											</option>)
@@ -174,7 +176,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        add: (debutA2,finA2,noeudA2,tempsA2) => dispatch(addScenarioALien(debutA2,finA2, noeudA2,tempsA2)),
+        add: (debutA2,finA2,noeudA2,tempsA2) => dispatch(addScenarioANoeud(debutA2,finA2, noeudA2,tempsA2)),
 		fetchData: (url, option) => dispatch(itemsFetchData(url, option)),
     };
 };

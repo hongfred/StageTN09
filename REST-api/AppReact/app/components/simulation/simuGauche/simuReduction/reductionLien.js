@@ -1,5 +1,5 @@
 import React from 'react';
-import {button, cadre, row, ul, selectMult, separation, label, buttonNav, affichage, span, field} from '../../../../css/style';
+import {button, cadre, row, ul, selectMult, separation, separationFirst, label, buttonNav, affichage, span, field} from '../../../../css/style';
 import {Button, Tab, Row, Col, Grid} from 'react-bootstrap';
 import { connect } from 'react-redux';
 import {
@@ -28,9 +28,11 @@ const renderField = ({
 class ReductionLien extends React.Component{
 	constructor(props) {
         super(props);
-		this.addS = this.addS.bind(this)
-		this.fetchVoisins = this.fetchVoisins.bind(this)
-		this.fetchComposants = this.fetchComposants.bind(this)
+		this.addS = this.addS.bind(this);
+		this.fetchVoisins = this.fetchVoisins.bind(this);
+		this.fetchComposants = this.fetchComposants.bind(this);
+		this.resetCV = this.resetCV.bind(this);
+		this.resetV = this.resetV.bind(this);
     }
 	
 	erreurD(){
@@ -53,8 +55,8 @@ class ReductionLien extends React.Component{
 	}
 	
 	addS(){
-		const reg1=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])h[0-5][0-9]$/.test(this.props.debutR1);
-		const reg2=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])h[0-5][0-9]$/.test(this.props.finR1);
+		const reg1=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])(h|H|:)[0-5][0-9]$/.test(this.props.debutR1);
+		const reg2=!/^([0-9]|0[0-9]|1[0-9]|2[0-3])(h|H|:)[0-5][0-9]$/.test(this.props.finR1);
 		const reg3=!/^[0-9]*$/.test(this.props.tauxR1);
 		if(reg1){
 			 document.getElementById('errorR1D_info').innerHTML="Format de l'heure de début non conforme!!";
@@ -93,6 +95,25 @@ class ReductionLien extends React.Component{
 			this.props.deleteV();
 		}
 	}
+	resetCV(){
+		this.props.deleteC();
+		this.props.deleteV();
+		if(this.props.nDR1!=undefined){
+			this.props.resetVar('nDR1');
+		}
+		if(this.props.nAR1!=undefined){
+			this.props.resetVar('nAR1');
+		}
+	}
+	resetV(){
+		this.props.deleteV();
+		if(this.props.nDR1!=undefined){
+			this.props.resetVar('nDR1');
+		}
+		if(this.props.nAR1!=undefined){
+			this.props.resetVar('nAR1');
+		}
+	}
 	fetchComposants(ligne){
 		this.props.deleteV();
 		let url = "http://localhost:1337/fetch/composants/"+ligne;
@@ -125,12 +146,12 @@ class ReductionLien extends React.Component{
 						<Row className="show-grid" >
 							<div style = {affichage}>
 								<ul>
-									debut: {JSON.stringify(this.props.debutR1)},
-									fin: {JSON.stringify(this.props.finR1)},
-									départ: {JSON.stringify(this.props.nDR1)},
-									arrivée: {JSON.stringify(this.props.nAR1)},
-									{JSON.stringify(this.props.ligneR1)},
-									taux: {JSON.stringify(this.props.tauxR1)}
+									<li>Debut: {JSON.stringify(this.props.debutR1)}</li>
+									<li>Fin: {JSON.stringify(this.props.finR1)}</li>
+									<li>Départ: {JSON.stringify(this.props.nDR1)}</li>
+									<li>Arrivée: {JSON.stringify(this.props.nAR1)}</li>
+									<li>Ligne: {JSON.stringify(this.props.ligneR1)}</li>
+									<li>Taux: {JSON.stringify(this.props.tauxR1)}</li>
 								</ul>
 							</div>	
 							<Col sm={6}>
@@ -151,8 +172,14 @@ class ReductionLien extends React.Component{
 								<div>
 									<label>Ligne</label>
 									<div>
-										<Field name="ligneR1" size="4" component="select" onChange={this.erreurL}>
-											<option></option>
+										<Field name="ligneR1" size="4" component="select" onChange={this.erreurL} style={selectMult}>
+											<option style={separationFirst} key='null' value=''
+											onClick={() => {
+													this.resetCV();
+												}}
+											>
+												select...
+											</option>
 											{this.props.MesLignes.map(items =>
 											<option key={items.idatelier}
 												onClick={() => {
@@ -160,6 +187,7 @@ class ReductionLien extends React.Component{
 													  items.ligne
 													);
 												}}
+												style={separation}
 											>
 												{items.ligne}
 											</option>)
@@ -176,7 +204,13 @@ class ReductionLien extends React.Component{
 									<label>Noeud de départ</label>
 									<div>
 										<Field name="nDR1" component="select" size="4" style={selectMult} onChange={this.erreurnD}>
-											<option></option>
+											<option style={separationFirst} key='null' value=''
+											onClick={() => {
+													this.resetV();
+												}}
+											>
+												select...
+											</option>
 											{this.props.MesComposants.map(composant =>
 												<option key={composant.idcomposante} 
 													onClick={() => {
@@ -203,7 +237,9 @@ class ReductionLien extends React.Component{
 									<label>Noeud d'arrivée</label>
 									<div>
 										<Field name="nAR1" component="select" size="4" style={selectMult} onChange={this.erreurnA}>
-											<option></option>
+											<option style={separationFirst} key='null' value=''>
+												select...
+											</option>
 											{this.props.MesVoisins.map(composant =>
 											<option key={composant.idcomposante} style={separation}>{composant.NomComposante}</option>)
 											}

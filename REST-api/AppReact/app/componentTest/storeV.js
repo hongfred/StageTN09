@@ -18,24 +18,15 @@ class StoreV extends React.Component{
 					<li>Voisins: {JSON.stringify(this.props.MesVoisinsR)}</li>
 					<li>ComposantsA: {JSON.stringify(this.props.MesComposantsA[0])}</li>
 					<li>VoisinsA: {JSON.stringify(this.props.MesVoisinsA)}</li>
-					<li>Todos: {JSON.stringify(this.props.maListe)}</li>
+					<li>Todos: {JSON.stringify(this.props.MaListe)}</li>
 					<li>Scenarios: {JSON.stringify(this.props.MesScenarios)}</li>
-					<li>Scenario: {JSON.stringify(this.props.Sc)}</li>
+					<li>PostScenarios: {JSON.stringify(this.props.PostScenarios)}</li>
 				</ul>
 			</div>
 		)
 	}
 }
-const selector = formValueSelector('addScenarioA') // <-- same as form name
-StoreV = connect(
-  state => {
-    // or together as a group
-    const { debut, fin, ligne, taux} = selector(state, 'debut', 'fin', 'ligne', 'taux')
-    return {
-      Sc: `debut: ${debut || ''} , fin: ${fin || ''} , ligne: ${ligne || ''} , taux: ${taux || ''}`
-    }
-  }
-)(StoreV)
+
 const mapStateToProps = (state) => {
     return {
 		MesItems: state.results, //gauche: nom de variable droite: le reducteur qui correspond
@@ -44,8 +35,9 @@ const mapStateToProps = (state) => {
 		MesComposantsA: state.itemsComposantA,
 		MesVoisinsR: state.itemsVoisinR,
 		MesVoisinsA: state.itemsVoisinA,
-		maListe: state.todos,
+		MaListe: state.todos,
 		MesScenarios: state.scenarios,
+		PostScenarios: state.postScenario
     };
 };
 

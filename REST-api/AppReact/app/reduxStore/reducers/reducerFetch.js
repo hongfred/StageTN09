@@ -12,7 +12,7 @@ import {
   ITEMS_FETCH_COMPOSANTS_A_SUCCESS,
   ITEMS_FETCH_VOISINS_A_SUCCESS,
  
-  SCENARIO_POST_SCENARIO_SUCCESS,
+  DATA_POST_SCENARIO_SUCCESS,
   
   ADD_SCENARIO_AUGMENTATION_LIEN,
   ADD_SCENARIO_AUGMENTATION_LIGNE,
@@ -153,7 +153,7 @@ function scenario(state, action) {
 		case ADD_SCENARIO_AUGMENTATION_NOEUD:
 			return{
 				id: action.id,
-				cas: "reduction",
+				cas: "augmentation",
 				debut: action.debut,
 				fin: action.fin,
 				noeud: action.noeud,
@@ -217,13 +217,6 @@ function scenario(state, action) {
 				taux: state.taux,
 				supp: !state.supp
 			};
-			
-        case SCENARIO_POST_SCENARIO_SUCCESS:
-            return [
-				{
-					scenario: action.scenario
-				}
-			]
         default:
             return state;
     }
@@ -269,7 +262,17 @@ function scenarios(state = [], action){
       return state;
 	  
   }
-};
+}
+
+function postScenario(state = [], action) {
+    switch (action.type) {
+        case DATA_POST_SCENARIO_SUCCESS:
+            return action.scenario;
+        default:
+            return state;
+    }
+}
+        
 
 const rootReducer = combineReducers({
     results,
@@ -282,6 +285,7 @@ const rootReducer = combineReducers({
     itemsHasErrored,
     itemsIsLoading,
 	scenarios,
+	postScenario,
 	todos,
 	form: formReducer
 })

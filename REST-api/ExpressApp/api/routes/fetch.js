@@ -4,9 +4,9 @@ var router = express.Router();
 var myDB = require('../database')
 var Promise = require('bluebird');
 
-//stringJ = JSON.stringify(stringJ);
+//De simples get qui permettent au front de récupérer les données qui l'intéressent selon la route appelée
 
-//attention injection sql, y jeter un coup d'oeil pour le faire corectement
+//attention injection sql, y jeter un coup d'oeil pour le faire correctement
 router.get('/:type', function (req, res) {
     console.log(req.params.type);
     if (req.params.type=== 'ligne') {

@@ -2,7 +2,7 @@ import React from 'react';
 import {jumbotron, h2, h3, panelDefault2, panelHeader} from '../../css/style';
 import {Modal, Row, Col, Grid, Panel} from 'react-bootstrap';
 
-import SimuDroite from './simuDroite.js';
+import SimuDroite from './simuDroite/simuDroite.js';
 import SimuGaucheStructure from './simuGauche/simuGaucheStructure.js';
 
 export class Simulation extends React.Component{
@@ -22,7 +22,7 @@ export class Simulation extends React.Component{
 							<Grid>
 								<Row className="show-grid">
 									<Col xs={12} md={8}>
-										<SimuGaucheStructure/>								
+										<SimuGaucheStructure/>	
 									</Col>
 									<Col xs={12} md={4}>
 										<SimuDroite/>
